@@ -710,6 +710,10 @@
             <xsl:choose>
                 <xsl:when test="exists(./gmd:MD_Keywords/gmd:thesaurusName)">
                     <xsl:choose>
+                        <!-- Special case: GBIF Dataset Type Vocabulary - detected via keyword href -->
+                        <xsl:when test="./gmd:MD_Keywords/gmd:keyword/gmx:Anchor[contains(string(@*[local-name()='href']), 'rs.gbif.org/vocabulary/gbif/datasetType')]">
+                            <keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+                        </xsl:when>
                         <xsl:when test="normalize-space(./gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:collectiveTitle/(gco:CharacterString | gmx:Anchor)) != ''">
                             <keywordThesaurus>
                                 <xsl:value-of select="normalize-space(./gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:collectiveTitle/(gco:CharacterString | gmx:Anchor))" />
