@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "saxon-js": "^2.7.0",
+    "xslt3": "^2.7.0"
+  }
+}

@@ -814,6 +814,11 @@
        ========================================================= -->
   <xsl:template name="coverage">
 
+    <!-- Collect all temporal extents from all EX_Extent blocks in the document -->
+    <xsl:variable name="allTemporalExtents"
+      select="gmd:identificationInfo/*/gmd:extent/gmd:EX_Extent/
+              gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent"/>
+
     <!-- ?? geographic coverage ???????????????????????????? -->
     <xsl:for-each select="gmd:identificationInfo/*/gmd:extent/gmd:EX_Extent/
                           gmd:geographicElement/gmd:EX_GeographicBoundingBox">
@@ -843,7 +848,9 @@
           </geographicCoverage>
 
           <!-- ?? temporal coverage ???????????????????????? -->
-          <xsl:call-template name="temporalCoverage"/>
+          <xsl:call-template name="temporalCoverage">
+            <xsl:with-param name="temporalExtents" select="$allTemporalExtents"/>
+          </xsl:call-template>
 
           <!-- ?? taxonomic coverage (placeholder) ?????????? -->
           <!-- NOTE: ISO 19139 has no equivalent for taxonomic information.
@@ -865,11 +872,11 @@
     <!-- Temporal coverage without geographic (if no bbox present) -->
     <xsl:if test="not(gmd:identificationInfo/*/gmd:extent/gmd:EX_Extent/
                       gmd:geographicElement/gmd:EX_GeographicBoundingBox)">
-      <xsl:variable name="hasTime" select="gmd:identificationInfo/*/gmd:extent/gmd:EX_Extent/
-                                           gmd:temporalElement/gmd:EX_TemporalExtent"/>
-      <xsl:if test="$hasTime">
+      <xsl:if test="$allTemporalExtents">
         <coverage>
-          <xsl:call-template name="temporalCoverage"/>
+          <xsl:call-template name="temporalCoverage">
+            <xsl:with-param name="temporalExtents" select="$allTemporalExtents"/>
+          </xsl:call-template>
         </coverage>
       </xsl:if>
     </xsl:if>
@@ -877,8 +884,8 @@
 
   <!-- ?? temporal coverage (reusable) ???????????????????????? -->
   <xsl:template name="temporalCoverage">
-    <xsl:for-each select="../../gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent |
-                          ../../../gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent">
+    <xsl:param name="temporalExtents"/>
+    <xsl:for-each select="$temporalExtents">
 
       <!-- GML 3.2 TimePeriod -->
       <xsl:variable name="begin" select="normalize-space(
